@@ -21,8 +21,8 @@ class ZZIndexSta:
 
     def get_style_fund_info(self,df):
         file_path = r"D:\\工作文件\\"
-        wind_df = pd.read_excel(file_path + "指数基金11月.xlsx")
-        wind_improve_df = pd.read_excel(file_path+'增强指数基金11月.xlsx')
+        wind_df = pd.read_excel(file_path + "指数基金12月.xlsx")
+        wind_improve_df = pd.read_excel(file_path+'增强指数基金12月.xlsx')
         wind_code_list = [code.split('.')[0] for code in wind_df['证券代码'].tolist()]
         wind_improve_code = [code.split('.')[0] for code in wind_improve_df['证券代码'].tolist()]
         dic_class_classify={}
@@ -31,12 +31,13 @@ class ZZIndexSta:
         for code in wind_code_list:
             if code in df.index.tolist():
                 if code not in wind_improve_code:
-                    if code!='162714':
+                    if code not in ['161811']:
                         class_classify = df.loc[code]['class_classify']
                     else:
                         class_classify='规模'
 
                     dic_class_classify[class_classify] = dic_class_classify.get(class_classify, 0) + 1
+
                     dic_result_classify[class_classify] = dic_result_classify.get(class_classify, [])
                     dic_result_classify[class_classify].append(code)
             else:
@@ -52,7 +53,7 @@ class ZZIndexSta:
             code_target = [code+'.OF' for code in code_list]
             fields = "sec_name,fund_setupdate,netasset_total,fund_corp_fundmanagementcompany,fund_trackindexcode," \
                      "return_1m,return_3m,return_6m,return_1y,return_3y,return_ytd,risk_sharpe,risk_maxdownside,risk_returnyearly,risk_stdevyearly"
-            options_str = "unit=1;tradeDate=20201101;annualized=0;startDate=20191031;endDate=20201031;period=2;returnType=1;yield=1;riskFreeRate=1"
+            options_str = "unit=1;tradeDate=20201129;annualized=0;startDate=20191130;endDate=20201201;period=2;returnType=1;yield=1;riskFreeRate=1"
             wssdata = w.wss(codes=code_target,fields=fields,options=options_str)
             if wssdata.ErrorCode!=0:
                 self.logger.info("获取wind数据错误%s"%wssdata.ErrorCode)
@@ -62,7 +63,7 @@ class ZZIndexSta:
             resultDf.rename(columns=name_dic_reuslt,inplace=True)
             resultDf['基金规模(亿元)'] = resultDf['基金规模(亿元)']/100000000
             resultDf.sort_values(by='基金规模(亿元)',ascending=False,inplace=True)
-            resultDf.to_excel(file_path+'11月%s型指数基金.xlsx'%class_classify)
+            resultDf.to_excel(file_path+'12月%s型指数基金.xlsx'%class_classify)
 
     def get_total_index_fund(self):
         sql_str = ''' SELECT t1.fund_code,t1.fund_type,t1.record_time,t1.product_type,t1.fund_name,t1.establish_date,t1.fund_company,

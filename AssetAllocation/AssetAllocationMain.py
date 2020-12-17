@@ -12,6 +12,7 @@ from datetime import date,datetime,timedelta
 from GetAndSaveWindData.GetDataTotalMain import GetDataTotalMain
 import mylog as mylog
 from AssetAllocation.CalcAssetAllocation import CalcAssetAllocation
+from AssetAllocation.GetMustData import GetMustData
 
 matplotlib.rcParams['font.sans-serif'] = ['SimHei']
 matplotlib.rcParams['font.family'] = 'sans-serif'
@@ -105,7 +106,9 @@ class AssetAllocationMain:
             model_param = self.get_best_param(method)
         else:
             model_param = best_param_dic
-        indexReturnDf = self.getAssetIndexData(startDate=startDate,endDate=endDate)
+        GetMustDataDemo = GetMustData()
+        indexReturnDf = GetMustDataDemo.getAssetIndexData(startDate=startDate,endDate=endDate,assetIndex=self.assetIndex)
+        self.indexReturnDf = indexReturnDf
 
         self.logger.info("---------------------model_param------------------>")
         self.logger.info(model_param)

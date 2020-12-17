@@ -156,6 +156,8 @@ class CalcAssetAllocation:
                 initX = weight_list[-1]
             else:
                 initX = pd.Series()
+        if datestr=='2020-12-15':
+            a=0
         weight = AssetAllocationOptimizationDemo.get_smart_weight(tempReturnDF, initX, assetIndex, method,
                                                                   IndexAllocationParam,indexReturnDf[indexReturnDf.index < datestr])
         weight.name = datestr

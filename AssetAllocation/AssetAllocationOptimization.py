@@ -321,7 +321,7 @@ class AssetAllocationOptimization:
         score_df['vol_rate'] = select_df['vol_rate'].rank(ascending=False)
         normal_df = (score_df - score_df.mean()) / score_df.std()
 
-        total_score = (normal_df * weight_score).sum(axis=1)
+        total_score = (normal_df * weight_score).sum(axis=1).sort_values(ascending=False)
 
         dic_poc = {}
         non_num = 5
@@ -337,8 +337,20 @@ class AssetAllocationOptimization:
             else:
                 dic_poc[code] = 0
 
-        weight = pd.Series(dic_poc).sort_values(ascending=False)
-        weight = weight - weight.iloc[non_num - 1]
+
+        if min(dic_poc.values())>=0:
+            weight = pd.Series(dic_poc).sort_values(ascending=False)
+            weight = weight - weight.iloc[non_num - 1]
+        else:
+            up_dic = {}
+            for code,values in dic_poc.items():
+                if values!=0:
+                    up_dic[code] = values-min(dic_poc.values())
+                else:
+                    up_dic[code] = 0
+            weight = pd.Series(up_dic).sort_values(ascending=False)
+            weight = weight - weight.iloc[non_num - 1]
+
         weight[weight < 0] = 0
         weight = (weight / weight.sum()) * (1 - risk_free_weight)
 
@@ -395,7 +407,7 @@ class AssetAllocationOptimization:
                                                temp_judge_market)
         return weight
 
-    def target_industry_recyle(self, returnDf, initX, asset_index, allocationParam):
+    def target_industry_recyle(self, returnDf, initX, asset_index, allocationParam,indexReturnDf):
         poc_num = 6
         max_index_loss_limit = allocationParam.get('max_index_loss_limit', 1.0003172585708973)
         poc_value_limit = allocationParam.get('poc_value_limit', 0.00020468015454708915)
